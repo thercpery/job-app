@@ -207,6 +207,36 @@ module.exports.loginUser = (userData) => {
     });
 };
 
+
+/* 
+    View profile
+    Business Logic:
+    1. Get the user from the session data.
+    2. Display the data excluding the password.
+*/
+module.exports.viewProfile = (sessionUser) => {
+    return knex("users")
+    .first()
+    .select("id", "first_name", "last_name", "mobile_number", "city_address", "username", "email", "is_admin", "created_at", "updated_at")
+    .where({
+        id: sessionUser.id
+    })
+    .then((user, err) => {
+        if(err){
+            return {
+                statusCode: 500,
+                response: false
+            };
+        }
+        else{
+            return {
+                statusCode: 200,
+                response: user
+            }
+        }
+    });
+};
+
 /* 
     Change password
     Business Logic:

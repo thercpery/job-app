@@ -17,6 +17,12 @@ router.post("/register", (req, res) => userController.registerUser(req.body).the
 // Login user
 router.post("/login", (req, res) => userController.loginUser(req.body).then(result => res.status(result.statusCode).send(result.response)));
 
+// View profile of user
+router.get("/", (req, res) => {
+    const sessionData = auth.decode(req.headers.authorization);
+    userController.viewProfile(sessionData, req.body).then(result => res.status(result.statusCode).send(result.response));
+});
+
 // Change password
 router.post("/change-password", auth.verify, (req, res) => {
     const sessionData = auth.decode(req.headers.authorization);
