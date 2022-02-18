@@ -4,6 +4,14 @@
  */
 exports.up = function(knex) {
     return knex.schema
+        .createTable("companies", table => {
+            table.increments("id").primary();
+            table.string("company_name").notNullable();
+            table.string("city_address").notNullable();
+            table.string("country").notNullable();
+            table.timestamp("created_at").defaultTo(knex.fn.now());
+            table.timestamp("updated_at").defaultTo(knex.fn.now());
+        })
         .createTable("users", table => {
             table.increments("id").primary();
             table.string("first_name").notNullable();
@@ -14,28 +22,31 @@ exports.up = function(knex) {
             table.string("email").unique().notNullable();
             table.string("password").notNullable();
             table.boolean("is_admin").defaultTo(false);
-            table.timestamp("created_at").defaultTo(knex.fn.now());
-            table.timestamp("updated_at").defaultTo(knex.fn.now());
-        })
-        .createTable("companies", table => {
-            table.increments("id").primary();
-            table.string("company_name").notNullable();
-            table.string("city_address").notNullable();
-            table.string("country").notNullable();
+            // table.boolean("is_hired").defaultTo(false);
+            // table.boolean("company_id").references("id").companies("companies");
             table.timestamp("created_at").defaultTo(knex.fn.now());
             table.timestamp("updated_at").defaultTo(knex.fn.now());
         })
         .createTable("jobs", table => {
             table.increments("id").primary();
-            table.string("job_name").notNullable();
+            table.string("job_title").notNullable();
             table.text("job_description").notNullable();
             table.float("salary").notNullable();
             table.boolean("is_remote").defaultTo(false);
             table.string("location").notNullable();
             table.integer("company_id").references("id").inTable("companies");
+            table.boolean("is_offered").defaultTo(true);
             table.timestamp("created_at").defaultTo(knex.fn.now());
             table.timestamp("updated_at").defaultTo(knex.fn.now());
-        });
+        })
+        // .createTable("job_applications", table => {
+        //     table.increments("id").primary();
+        //     table.integer("applicant_id").references("id").inTable("users");
+        //     table.integer("posting_id").references("id").inTable("jobs");
+        //     table.boolean("is_active").defaultTo(true);
+        //     table.timestamp("created_at").defaultTo(knex.fn.now());
+        //     table.timestamp("updated_at").defaultTo(knex.fn.now());
+        // });
         
 };
 
@@ -45,7 +56,8 @@ exports.up = function(knex) {
  */
 exports.down = function(knex) {
     return knex.schema
+        // .dropTableIfExists("job_applications")
         .dropTableIfExists("jobs")
-        .dropTableIfExists("companies")
-        .dropTableIfExists("users");
+        .dropTableIfExists("users")
+        .dropTableIfExists("companies");
 };

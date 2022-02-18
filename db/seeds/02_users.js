@@ -7,8 +7,8 @@ const bcrypt = require("bcrypt");
 
 exports.seed = async function(knex) {
   // Deletes ALL existing entries
-  await knex('table_name').del()
-  await knex('table_name').insert([
+  await knex('users').del()
+  await knex('users').insert([
     {
       id: 1, 
       first_name: 'Admin',
@@ -27,7 +27,7 @@ exports.seed = async function(knex) {
       mobile_number: "09123456789",
       city_address: "Pasay City",
       username: "iamjohndope",
-      email: "iamdope@admin.com",
+      email: "iamdope@mail.com",
       password: bcrypt.hashSync("dopeee", 10)
     },
     {
@@ -36,8 +36,8 @@ exports.seed = async function(knex) {
       last_name: "Lannister",
       mobile_number: "09171234657",
       city_address: "City of Manila",
-      username: "admin",
-      email: "admin@admin.com",
+      username: "jamielannister",
+      email: "jami@lannister.com",
       password: bcrypt.hashSync("thelannisterssendtheirregards", 10)
     },
     {
@@ -61,4 +61,6 @@ exports.seed = async function(knex) {
       password: bcrypt.hashSync("iamsherlock", 10)
     }
   ]);
+
+  await knex.raw("select setval('users_id_seq', max(users.id)) from users");
 };
