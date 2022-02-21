@@ -88,7 +88,7 @@ module.exports.viewCompanyByID = (id) => {
     .where({
         id: id
     })
-    .then((company, err) => {
+    .then(async (company, err) => {
         if(err){
             return {
                 statusCode: 500,
@@ -97,6 +97,14 @@ module.exports.viewCompanyByID = (id) => {
         }
         else{
             if(company !== undefined){
+                const job_postings = await knex
+                    .select()
+                    .from("jobs")
+                    .where({
+                        company_id: company.id
+                    })
+                    .then(data => data);
+                company.job_postings = job_postings;
                 return {
                     statusCode: 200,
                     response: company

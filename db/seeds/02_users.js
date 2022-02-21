@@ -58,7 +58,7 @@ exports.seed = async function(knex) {
       email: "jon@snow.com",
       password: bcrypt.hashSync("1234", 10),
       is_private: false,
-      is_true: false
+      is_hired: false
     },
     {
       id: 5, 
@@ -120,7 +120,7 @@ exports.seed = async function(knex) {
       password: bcrypt.hashSync("chri!1s", 10),
       is_private: true,
       is_hired: true,
-      
+      company_id: 3
     },
     {
       id: 10, 
