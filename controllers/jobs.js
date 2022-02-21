@@ -8,8 +8,12 @@ const auth = require("../auth");
     2. Display the data.
 */
 module.exports.viewAllJobs = () => {
-    return knex.select()
+    return knex
+    .select("jobs.*", "companies.company_name as company_name")
     .from("jobs")
+    .leftJoin("companies", {
+        "companies.id": "jobs.company_id"
+    })
     .then((jobs, err) => {
         if(err){
             return {

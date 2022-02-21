@@ -6,7 +6,9 @@ module.exports.createAccessToken = (user) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        is_admin: user.is_admin
+        is_admin: user.is_admin,
+        is_hired: user.is_hired,
+        company_id: user.company_id
     };
     return jwt.sign(data, secret, {});
 };

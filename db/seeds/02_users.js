@@ -19,7 +19,9 @@ exports.seed = async function(knex) {
       email: "admin@admin.com",
       password: bcrypt.hashSync("admin", 10),
       is_admin: true,
-      is_private: false
+      is_private: false,
+      is_hired: true,
+      company_id: 1
     },
     {
       id: 2, 
@@ -30,7 +32,9 @@ exports.seed = async function(knex) {
       username: "iamjohndope",
       email: "iamdope@mail.com",
       password: bcrypt.hashSync("dopeee", 10),
-      is_private: true
+      is_private: true,
+      is_hired: true,
+      company_id: 1
     },
     {
       id: 3, 
@@ -41,7 +45,8 @@ exports.seed = async function(knex) {
       username: "jamielannister",
       email: "jami@lannister.com",
       password: bcrypt.hashSync("thelannisterssendtheirregards", 10),
-      is_private: false
+      is_private: false,
+      is_hired: false
     },
     {
       id: 4, 
@@ -52,7 +57,8 @@ exports.seed = async function(knex) {
       username: "jonsnow",
       email: "jon@snow.com",
       password: bcrypt.hashSync("1234", 10),
-      is_private: false
+      is_private: false,
+      is_true: false
     },
     {
       id: 5, 
@@ -63,7 +69,9 @@ exports.seed = async function(knex) {
       username: "iamsherlock",
       email: "iamsherlock@mail.com",
       password: bcrypt.hashSync("iamsherlock", 10),
-      is_private: true
+      is_private: true,
+      is_hired: true,
+      company_id: 4
     },
     {
       id: 6, 
@@ -74,7 +82,8 @@ exports.seed = async function(knex) {
       username: "al1cemartinez",
       email: "alice_martinez@mail.com",
       password: bcrypt.hashSync("al!!ce", 10),
-      is_private: false
+      is_private: false,
+      is_hired: false
     },
     {
       id: 7, 
@@ -85,7 +94,8 @@ exports.seed = async function(knex) {
       username: "bobsmith",
       email: "bobsmith@mail.com",
       password: bcrypt.hashSync("bobsmith", 10),
-      is_private: true
+      is_private: true,
+      is_hired: false
     },
     {
       id: 8, 
@@ -96,7 +106,8 @@ exports.seed = async function(knex) {
       username: "jones_charlie",
       email: "charlie_jones_97@mail.com",
       password: bcrypt.hashSync("j--nes", 10),
-      is_private: false
+      is_private: false,
+      is_hired: false,
     },
     {
       id: 9, 
@@ -107,7 +118,9 @@ exports.seed = async function(knex) {
       username: "walker_chrisss",
       email: "walker_chris@mail.com",
       password: bcrypt.hashSync("chri!1s", 10),
-      is_private: true
+      is_private: true,
+      is_hired: true,
+      
     },
     {
       id: 10, 

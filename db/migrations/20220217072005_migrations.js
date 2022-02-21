@@ -22,8 +22,8 @@ exports.up = function(knex) {
             table.string("email").unique().notNullable();
             table.string("password").notNullable();
             table.boolean("is_admin").defaultTo(false);
-            // table.boolean("is_hired").defaultTo(false);
-            // table.integer("company_id").references("id").inTable("companies");
+            table.boolean("is_hired").defaultTo(false);
+            table.integer("company_id").references("id").inTable("companies");
             table.boolean("is_private").defaultTo(false);
             table.timestamp("created_at").defaultTo(knex.fn.now());
             table.timestamp("updated_at").defaultTo(knex.fn.now());

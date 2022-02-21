@@ -122,7 +122,9 @@ module.exports.registerUser = async (reqBody) => {
             username: reqBody.username,
             email: reqBody.email,
             password: bcrypt.hashSync(reqBody.password, 10), // ENCRYPT PASSWORD!!
-            is_private: reqBody.is_private || false
+            is_private: reqBody.is_private || false,
+            is_hired: reqBody.is_hired || false,
+            company_id: reqBody.company_id || null
         };
         // Check if there are duplicate username/email
         const ifEmailExists = await this.checkEmailExists(userData.email);
