@@ -18,7 +18,8 @@ exports.seed = async function(knex) {
       username: "admin",
       email: "admin@admin.com",
       password: bcrypt.hashSync("admin", 10),
-      is_admin: true
+      is_admin: true,
+      is_private: false
     },
     {
       id: 2, 
@@ -28,7 +29,8 @@ exports.seed = async function(knex) {
       city_address: "Pasay City",
       username: "iamjohndope",
       email: "iamdope@mail.com",
-      password: bcrypt.hashSync("dopeee", 10)
+      password: bcrypt.hashSync("dopeee", 10),
+      is_private: true
     },
     {
       id: 3, 
@@ -38,7 +40,8 @@ exports.seed = async function(knex) {
       city_address: "City of Manila",
       username: "jamielannister",
       email: "jami@lannister.com",
-      password: bcrypt.hashSync("thelannisterssendtheirregards", 10)
+      password: bcrypt.hashSync("thelannisterssendtheirregards", 10),
+      is_private: false
     },
     {
       id: 4, 
@@ -48,7 +51,8 @@ exports.seed = async function(knex) {
       city_address: "Taguig City",
       username: "jonsnow",
       email: "jon@snow.com",
-      password: bcrypt.hashSync("1234", 10)
+      password: bcrypt.hashSync("1234", 10),
+      is_private: false
     },
     {
       id: 5, 
@@ -58,7 +62,63 @@ exports.seed = async function(knex) {
       city_address: "London",
       username: "iamsherlock",
       email: "iamsherlock@mail.com",
-      password: bcrypt.hashSync("iamsherlock", 10)
+      password: bcrypt.hashSync("iamsherlock", 10),
+      is_private: true
+    },
+    {
+      id: 6, 
+      first_name: 'Alice',
+      last_name: "Martinez",
+      mobile_number: "09521234567",
+      city_address: "Mandaluyong City",
+      username: "al1cemartinez",
+      email: "alice_martinez@mail.com",
+      password: bcrypt.hashSync("al!!ce", 10),
+      is_private: false
+    },
+    {
+      id: 7, 
+      first_name: 'Bob',
+      last_name: "Smith",
+      mobile_number: "09157894561",
+      city_address: "Taguig City",
+      username: "bobsmith",
+      email: "bobsmith@mail.com",
+      password: bcrypt.hashSync("bobsmith", 10),
+      is_private: true
+    },
+    {
+      id: 8, 
+      first_name: 'Charlie',
+      last_name: "Jones",
+      mobile_number: "09157894561",
+      city_address: "Quezon City",
+      username: "jones_charlie",
+      email: "charlie_jones_97@mail.com",
+      password: bcrypt.hashSync("j--nes", 10),
+      is_private: false
+    },
+    {
+      id: 9, 
+      first_name: 'Chris',
+      last_name: "Walker",
+      mobile_number: "09167895463",
+      city_address: "Urdaneta",
+      username: "walker_chrisss",
+      email: "walker_chris@mail.com",
+      password: bcrypt.hashSync("chri!1s", 10),
+      is_private: true
+    },
+    {
+      id: 10, 
+      first_name: 'Devon',
+      last_name: "Walker",
+      mobile_number: "09264445557",
+      city_address: "Quezon City",
+      username: "devonwalker",
+      email: "devonwalker@mail.com",
+      password: bcrypt.hashSync("devonwalks", 10),
+      is_private: false
     }
   ]);
 

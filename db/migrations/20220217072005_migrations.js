@@ -23,7 +23,8 @@ exports.up = function(knex) {
             table.string("password").notNullable();
             table.boolean("is_admin").defaultTo(false);
             // table.boolean("is_hired").defaultTo(false);
-            // table.boolean("company_id").references("id").companies("companies");
+            // table.integer("company_id").references("id").inTable("companies");
+            table.boolean("is_private").defaultTo(false);
             table.timestamp("created_at").defaultTo(knex.fn.now());
             table.timestamp("updated_at").defaultTo(knex.fn.now());
         })
@@ -39,10 +40,22 @@ exports.up = function(knex) {
             table.timestamp("created_at").defaultTo(knex.fn.now());
             table.timestamp("updated_at").defaultTo(knex.fn.now());
         })
-        // .createTable("job_applications", table => {
+        .createTable("job_applications", table => {
+            table.increments("id").primary();
+            table.integer("applicant_id").references("id").inTable("users");
+            table.integer("posting_id").references("id").inTable("jobs");
+            table.boolean("is_active").defaultTo(true);
+            table.text("cover_letter");
+            table.timestamp("created_at").defaultTo(knex.fn.now());
+            table.timestamp("updated_at").defaultTo(knex.fn.now());
+        })
+        // .createTable("job_experiences", table => {
         //     table.increments("id").primary();
-        //     table.integer("applicant_id").references("id").inTable("users");
-        //     table.integer("posting_id").references("id").inTable("jobs");
+        //     table.integer("user_id").references("id").inTable("users");
+        //     table.integer("company_id").references("id").inTable("companies");
+        //     table.string("position").notNullable();
+        //     table.date("start_date").notNullable().defaultTo(knex.fn.now());
+        //     table.date("end_date");
         //     table.boolean("is_active").defaultTo(true);
         //     table.timestamp("created_at").defaultTo(knex.fn.now());
         //     table.timestamp("updated_at").defaultTo(knex.fn.now());
@@ -56,7 +69,8 @@ exports.up = function(knex) {
  */
 exports.down = function(knex) {
     return knex.schema
-        // .dropTableIfExists("job_applications")
+    // .dropTableIfExists("job_experiences")
+        .dropTableIfExists("job_applications")
         .dropTableIfExists("jobs")
         .dropTableIfExists("users")
         .dropTableIfExists("companies");

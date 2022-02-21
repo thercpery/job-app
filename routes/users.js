@@ -18,9 +18,9 @@ router.post("/register", (req, res) => userController.registerUser(req.body).the
 router.post("/login", (req, res) => userController.loginUser(req.body).then(result => res.status(result.statusCode).send(result.response)));
 
 // View profile of user
-router.get("/", (req, res) => {
+router.get("/:username", (req, res) => {
     const sessionData = auth.decode(req.headers.authorization);
-    userController.viewProfile(sessionData, req.body).then(result => res.status(result.statusCode).send(result.response));
+    userController.viewProfile(sessionData, req.params.username).then(result => res.status(result.statusCode).send(result.response));
 });
 
 // Change password

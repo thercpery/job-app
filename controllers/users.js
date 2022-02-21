@@ -121,7 +121,8 @@ module.exports.registerUser = async (reqBody) => {
             city_address: reqBody.city_address,
             username: reqBody.username,
             email: reqBody.email,
-            password: bcrypt.hashSync(reqBody.password, 10) // ENCRYPT PASSWORD!!
+            password: bcrypt.hashSync(reqBody.password, 10), // ENCRYPT PASSWORD!!
+            is_private: reqBody.is_private || false
         };
         // Check if there are duplicate username/email
         const ifEmailExists = await this.checkEmailExists(userData.email);
@@ -129,7 +130,7 @@ module.exports.registerUser = async (reqBody) => {
         if(ifEmailExists.response && ifUsernameExists.response){
             // If username and email exists
             return {
-                statusCode: 200,
+                statusCode: 401,
                 response: false
             };
         }
@@ -159,7 +160,7 @@ module.exports.registerUser = async (reqBody) => {
     else{
         // If there are missing fields
         return {
-            statusCode: 200,
+            statusCode: 401,
             response: false
         };
     }  
@@ -211,15 +212,18 @@ module.exports.loginUser = (userData) => {
 /* 
     View profile
     Business Logic:
-    1. Get the user from the session data.
-    2. Display the data excluding the password.
+    1. Get the user from the username from the request parameters.
+    2. If username exists and user is public, display the data excluding the password.
+    3. If user is private and there is an authenticated user, return the user.
+    4. If user is private and there is no authenticated user, return false.
+    5. Return false if username does not exists.
 */
-module.exports.viewProfile = (sessionUser) => {
+module.exports.viewProfile = (sessionUser, username) => {
     return knex("users")
     .first()
-    .select("id", "first_name", "last_name", "mobile_number", "city_address", "username", "email", "is_admin", "created_at", "updated_at")
+    .select("id", "first_name", "last_name", "mobile_number", "city_address", "username", "email", "created_at", "updated_at")
     .where({
-        id: sessionUser.id
+        username: username
     })
     .then((user, err) => {
         if(err){
@@ -229,9 +233,38 @@ module.exports.viewProfile = (sessionUser) => {
             };
         }
         else{
-            return {
-                statusCode: 200,
-                response: user
+            if(user !== undefined){
+                // Username exist.
+                if(user.is_private){
+                    // User is private
+                    if(sessionUser){
+                        // There is an authenticated user
+                        return {
+                            statusCode: 200,
+                            response: user
+                        };
+                    }
+                    else{
+                        return {
+                            statusCode: 401,
+                            response: false
+                        };
+                    }
+                }
+                else{
+                    // User is not private
+                    return {
+                        statusCode: 200,
+                        response: user
+                    };
+                }
+            }
+            else{
+                // Username does not exist.
+                return {
+                    statusCode: 404,
+                    response: false
+                };
             }
         }
     });
@@ -246,54 +279,64 @@ module.exports.viewProfile = (sessionUser) => {
     4. If it matches, save the new password.
 */
 module.exports.changePassword = (sessionData, reqBody) => {
-    return knex("users")
-    .first()
-    .where({
-        id: sessionData.id
-    })
-    .then((user, err) => {
-        if(err){
-            return {
-                statusCode: 500,
-                response: false
-            };
-        }
-        else{
-            const isPasswordCorrect = bcrypt.compareSync(reqBody.oldPassword, user.password);
-            if(isPasswordCorrect){
-                // If password is correct.
-                return knex("users")
-                .update({
-                    password: bcrypt.hashSync(reqBody.newPassword, 10)
-                })
-                .where({
-                    id: user.id
-                })
-                .then((saved, err) => {
-                    if(err){
-                        return {
-                            statusCode: 500,
-                            response: false
-                        };
-                    }
-                    else{
-                        // New password successfully saved.
-                        return {
-                            statusCode: 200,
-                            response: true
-                        };
-                    }
-                });
-            }
-            else{
-                // If password is not correct
+    if(sessionData){
+        // If there is an authenticated user
+        return knex("users")
+        .first()
+        .where({
+            id: sessionData.id
+        })
+        .then((user, err) => {
+            if(err){
                 return {
-                    statusCode: 200,
+                    statusCode: 500,
                     response: false
                 };
             }
-        }
-    });
+            else{
+                const isPasswordCorrect = bcrypt.compareSync(reqBody.oldPassword, user.password);
+                if(isPasswordCorrect){
+                    // If password is correct.
+                    return knex("users")
+                    .update({
+                        password: bcrypt.hashSync(reqBody.newPassword, 10)
+                    })
+                    .where({
+                        id: user.id
+                    })
+                    .then((saved, err) => {
+                        if(err){
+                            return {
+                                statusCode: 500,
+                                response: false
+                            };
+                        }
+                        else{
+                            // New password successfully saved.
+                            return {
+                                statusCode: 201,
+                                response: true
+                            };
+                        }
+                    });
+                }
+                else{
+                    // If password is not correct
+                    return {
+                        statusCode: 400,
+                        response: false
+                    };
+                }
+            }
+        });
+    }
+    else{
+        // If there is no user authenticated
+        return {
+            statusCode: 403,
+            response: false
+        };
+    }
 };
 
 /* 

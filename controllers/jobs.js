@@ -34,10 +34,12 @@ module.exports.viewAllJobs = () => {
     3. If found, display the data. Otherwise, return false
 */
 module.exports.viewJobById = (id) => {
-    return knex("jobs")
-    .first()
+    return knex
+    .select("jobs.*", "companies.company_name as company_name")
+    .from("jobs")
+    .leftJoin("companies", {"companies.id": "jobs.company_id"})
     .where({
-        id: id
+        "jobs.id": id
     })
     .then((job, err) => {
         if(err){
@@ -47,10 +49,18 @@ module.exports.viewJobById = (id) => {
             };
         }
         else{
-            return {
-                statusCode: 200,
-                response: job
-            };
+            if(job !== 0){
+                return {
+                    statusCode: 200,
+                    response: job
+                };
+            }
+            else{
+                return {
+                    statusCode: 404,
+                    response: false
+                };
+            }
         }
     })
 };
