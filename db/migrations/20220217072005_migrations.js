@@ -16,6 +16,10 @@ exports.up = function(knex) {
             table.increments("id").primary();
             table.string("first_name").notNullable();
             table.string("last_name").notNullable();
+            table.string("middle_name");
+            table.string("suffix_name");
+            table.string("gender").notNullable().checkIn(["male", "female", "other"]);
+            table.string("civil_status").notNullable().checkIn(["single", "married", "legally seperated", "annulled", "divorced"]);
             table.string("mobile_number").notNullable();
             table.string("city_address").notNullable();
             table.string("username").unique().notNullable();

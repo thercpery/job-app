@@ -29,9 +29,16 @@ router.post("/change-password", auth.verify, (req, res) => {
     userController.changePassword(sessionData, req.body).then(result => res.status(result.statusCode).send(result.response));
 });
 
+// Make user an admin
 router.patch("/make-admin", auth.verify, (req, res) => {
     const sessionData = auth.decode(req.headers.authorization);
     userController.makeUserAsAdmin(sessionData, req.body).then(result => res.status(result.statusCode).send(result.response));
+});
+
+// Change user details
+router.put("/", auth.verify, (req, res) => {
+    const sessionData = auth.decode(req.headers.authorization);
+    userController.changeUserDetails(sessionData, req.body).then(result => res.status(result.statusCode).send(result.response));
 });
 
 module.exports = router;

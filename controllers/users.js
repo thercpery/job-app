@@ -177,37 +177,99 @@ module.exports.registerUser = async (reqBody) => {
     4. Generate/return a jsonwebtoken if the user is successfully logged in and return false if not.
     5. If username/email does not exist, return false.
 */
-module.exports.loginUser = (userData) => {
-    return knex("users")
-    .first()
-    .where({
-        username: userData.username
-    })
-    .then((user, err) => {
-        if(err){
+module.exports.loginUser = async (userData) => {
+    if(userData.hasOwnProperty("username")){
+        // If username is typed.
+        const doesUsernameExists = await this.checkUsernameExists(userData.username);
+        if(doesUsernameExists.response){
+            // If username exists
+            return knex("users")
+            .first()
+            .where({
+                username: userData.username
+            })
+            .then((user, err) => {
+                if(err){
+                    return {
+                        statusCode: 500,
+                        response: false
+                    };
+                }
+                else{
+                    const isPasswordCorrect = bcrypt.compareSync(userData.password, user.password);
+                    if(isPasswordCorrect){
+                        return {
+                            statusCode: 200,
+                            response: {
+                                accessToken: auth.createAccessToken(user)
+                            }
+                        };
+                    }
+                    else{
+                        return {
+                            statusCode: 200,
+                            response: false
+                        };
+                    }
+                }
+            });
+        }
+        else{
+            // If username does not exist
             return {
-                statusCode: 500,
+                statusCode: 401,
                 response: false
             };
         }
-        else{
-            const isPasswordCorrect = bcrypt.compareSync(userData.password, user.password);
-            if(isPasswordCorrect){
-                return {
-                    statusCode: 200,
-                    response: {
-                        accessToken: auth.createAccessToken(user)
+    }
+    else if(userData.hasOwnProperty("email")){
+        // If email is typed.
+        const doesEmailExists = await this.checkEmailExists(userData.email);
+        if(doesEmailExists.response){
+            return knex("users")
+            .first()
+            .where({
+                email: userData.email
+            })
+            .then((user, err) => {
+                if(err){
+                    return {
+                        statusCode: 500,
+                        response: false
+                    };
+                }
+                else{
+                    const isPasswordCorrect = bcrypt.compareSync(userData.password, user.password);
+                    if(isPasswordCorrect){
+                        return {
+                            statusCode: 200,
+                            response: {
+                                accessToken: auth.createAccessToken(user)
+                            }
+                        };
                     }
-                };
-            }
-            else{
-                return {
-                    statusCode: 200,
-                    response: false
-                };
-            }
+                    else{
+                        return {
+                            statusCode: 200,
+                            response: false
+                        };
+                    }
+                }
+            });
         }
-    });
+        else{
+            return {
+                statusCode: 401,
+                response: false
+            };
+        }
+    }
+    else{
+        return {
+            statusCode: 401,
+            response: false
+        };
+    }
 };
 
 
@@ -386,6 +448,44 @@ module.exports.makeUserAsAdmin = async (sessionData, userData) => {
         // If logged in user is not an admin.
         return {
             statusCode: 200,
+            response: false
+        };
+    }
+};
+
+/* 
+    Change user details
+    Business Logic:
+    1. Check the request body data if the username/email exists
+    2. If username and/or email exists, return false.
+    3. If not, update the user data into the database.
+*/
+
+module.exports.changeUserDetails = (sessionData, userData) => {
+    if(sessionData){
+        return knex("users")
+        .update(userData)
+        .where({
+            id: sessionData.id
+        })
+        .then((updated, err) => {
+            if(err){
+                return {
+                    statusCode: 500,
+                    response: false
+                };
+            }
+            else{
+                return {
+                    statusCode: 201,
+                    response: true
+                };
+            }
+        });
+    }
+    else{
+        return {
+            statusCode: 403,
             response: false
         };
     }

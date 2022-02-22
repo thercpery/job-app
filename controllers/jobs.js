@@ -78,10 +78,14 @@ module.exports.viewJobById = (id) => {
     3. Save the job data in the database.
 */
 module.exports.createJob = (sessionData, jobData) => {
-    if(
-        sessionData.is_admin && 
-        sessionData.is_hired
-    ){
+    if(!sessionData.is_admin && !sessionData.is_hired){
+        // If user is not an admin and is not hired
+        return {
+            statusCode: 200,
+            response: false
+        };
+    }
+    else{
         // If user is hired and an admin
         if(
             jobData.hasOwnProperty("job_title") &&
@@ -120,11 +124,5 @@ module.exports.createJob = (sessionData, jobData) => {
                 response: false
             };
         }
-    }
-    else{
-        return {
-            statusCode: 403,
-            response: false
-        };
     }
 };
