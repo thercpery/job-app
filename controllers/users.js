@@ -303,12 +303,33 @@ module.exports.viewProfile = (sessionUser, username) => {
                     // User is private
                     if(sessionUser){
                         // There is an authenticated user
-                        return {
-                            statusCode: 200,
-                            response: user
-                        };
+                        return knex("users_followers")
+                        .first()
+                        .where({
+                            follower_id: sessionUser.id,
+                            following_id: user.id,
+                            is_approved: true
+                        })
+                        .then((data, err) => {
+                            if(err){}
+                            else{
+                                if(data !== undefined){
+                                    return {
+                                        statusCode: 200,
+                                        response: user
+                                    };
+                                }
+                                else{
+                                    return {
+                                        statusCode: 403,
+                                        response: false
+                                    };
+                                }
+                            }
+                        })
                     }
                     else{
+                        // There is no authenticated user.
                         return {
                             statusCode: 401,
                             response: false
@@ -318,8 +339,8 @@ module.exports.viewProfile = (sessionUser, username) => {
                 else{
                     // User is not private
                     return {
-                        statusCode: 403,
-                        response: false
+                        statusCode: 200,
+                        response: user
                     };
                 }
             }
@@ -431,7 +452,7 @@ module.exports.makeUserAsAdmin = async (sessionData, userData) => {
                 }
                 else{
                     return {
-                        statusCode: 200,
+                        statusCode: 201,
                         response: true
                     };
                 }
@@ -489,4 +510,185 @@ module.exports.changeUserDetails = (sessionData, userData) => {
             response: false
         };
     }
+};
+
+/* 
+    Search users by name/username
+    Business Logic:
+    1. Get the search data from request body.
+    2. Search the user from the search data.
+    3. If there is user data found, determine if the user found is public and if there is a user authenticated. Otherwise return false.
+    4. If the user is public, return user data. If the user is private and there is an authenticated user, return user data. Otherwise return false.
+*/
+
+module.exports.searchUser = (searchData, sessionData) => {
+    const data = searchData.searchData;
+    return knex
+    .select("id", "first_name", "last_name", "middle_name", "suffix_name", "gender", "civil_status", "mobile_number", "city_address", "company_id", "is_private")
+    .from("users")
+    .where((builder) => {
+        builder
+        .where("first_name", "like", `%${data}%`)
+        .orWhere("last_name", "like", `%${data}%`)
+        .orWhere("middle_name", "like", `%${data}%`)
+        .orWhere("username", "like", `%${data}%`)
+    })
+    .then((users, err) => {
+        if(err){
+            return {
+                statusCode: 500,
+                response: false
+            };
+        }
+        else{
+            if(sessionData){
+                return {
+                    statusCode: 200,
+                    response: users
+                };
+            }
+            else{
+                return {
+                    statusCode: 200,
+                    response: users.filter(user => user.is_private === false)
+                };
+            }
+        }
+    });
+};
+
+/* 
+    Follow a user
+    Business Logic:
+    1. Get the user ID from the request parameter (the authenticated user that will be following) and the authenticated user ID.
+    2. Search user data of the user ID that will be followed and determine if the user has the same ID as the authenticated user ID.
+    3. If it's the same, return false.
+*/
+module.exports.followUser = (sessionData, userId) => {
+    return knex("users")
+    .first()
+    .where({
+        id: userId
+    })
+    .then((user, err) => {
+        if(err){
+            return {
+                statusCode: 500,
+                response: false
+            };
+        }
+        else{
+            if(sessionData){
+                if(user !== undefined){
+                    if(user.id !== sessionData.id){
+                        const users_followers_data = {
+                            follower_id: sessionData.id,
+                            following_id: user.id,
+                            is_approved: (user.is_private) ? false : true
+                        };
+                        // Check if there are duplicate data
+                        return knex("users_followers")
+                        .first()
+                        .where({
+                            follower_id: users_followers_data.follower_id,
+                            following_id: users_followers_data.following_id
+                        })
+                        .then((data, err) => {
+                            if(err){
+                                return {
+                                    statusCode: 500,
+                                    response: false
+                                };
+                            }
+                            else{
+                                if(data === undefined){
+                                    // If there is no duplicate data.
+                                    return knex("users_followers")
+                                    .insert(users_followers_data)
+                                    .then((saved, err) => {
+                                        if(err){
+                                            return {
+                                                statusCode: 500,
+                                                response: false
+                                            };
+                                        }
+                                        else{
+                                            return {
+                                                statusCode: 201,
+                                                response: true
+                                            };
+                                        }
+                                    });
+                                }
+                                else{
+                                    // If there is duplicate data.
+                                    return {
+                                        statusCode: 403,
+                                        response: false
+                                    };
+                                }
+                            }
+                        })
+                    }
+                    else{
+                        // If the authenticated user ID is the same as the user ID
+                        return {
+                            statusCode: 403,
+                            response: false
+                        };
+                    }
+                }
+                else{
+                    return {
+                        statusCode: 404,
+                        response: false
+                    };
+                }
+            }
+            else{
+                // If there is no JWT token. 
+                return {
+                    statusCode: 403,
+                    response: false
+                }
+            }
+        }
+    })
+};
+
+/* 
+    Approve follow request for private users.
+    Business Logic:
+    1. Get the authenticated user data and user ID from the request parameters.
+    2. Check the "users_followers" table with the authenticated user ID and user ID from the req parameters.
+    3. If data exists, approve follow request.
+*/
+module.exports.approveFollowRequest = (sessionData, userId) => {
+    const users_followers_data = {
+        follower_id: userId,
+        following_id: sessionData.id
+    };
+    console.log(users_followers_data)
+    return knex("users_followers")
+    .update({
+        is_approved: true
+    })
+    .where({
+        follower_id: users_followers_data.follower_id,
+        following_id: users_followers_data.following_id
+    })
+    .then((saved, err) => {
+        if(err){
+            return {
+                statusCode: 500,
+                response: false
+            };
+        }
+        else{
+            return {
+                statusCode: 201,
+                response: true
+            };
+        }
+    });
 };

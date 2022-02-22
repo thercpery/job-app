@@ -32,6 +32,14 @@ exports.up = function(knex) {
             table.timestamp("created_at").defaultTo(knex.fn.now());
             table.timestamp("updated_at").defaultTo(knex.fn.now());
         })
+        .createTable("users_followers", table => {
+            table.increments("id").primary();
+            table.integer("follower_id").references("id").inTable("users");
+            table.integer("following_id").references("id").inTable("users");
+            table.boolean("is_approved").defaultTo(true);
+            table.timestamp("created_at").defaultTo(knex.fn.now());
+            table.timestamp("updated_at").defaultTo(knex.fn.now());
+        })
         .createTable("jobs", table => {
             table.increments("id").primary();
             table.string("job_title").notNullable();
@@ -76,6 +84,7 @@ exports.down = function(knex) {
     // .dropTableIfExists("job_experiences")
         .dropTableIfExists("job_applications")
         .dropTableIfExists("jobs")
+        .dropTableIfExists("users_followers")
         .dropTableIfExists("users")
         .dropTableIfExists("companies");
 };

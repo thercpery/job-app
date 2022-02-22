@@ -4,7 +4,7 @@ const auth = require("../auth");
 /* 
     View all companies
     Business Logic:
-    1. Get all the companies in the database (TODO:) including the job postings.
+    1. Get all the companies in the database.
     2. Display the data.
 */
 module.exports.viewAllCompanies = () => {
@@ -119,3 +119,10 @@ module.exports.viewCompanyByID = (id) => {
         }
     });
 };
+
+/* 
+    Search companies by company name
+    Business Logic:
+    1. 
+*/
+module.exports.searchByCompanyName = (searchData) => {};

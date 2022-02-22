@@ -147,3 +147,23 @@ module.exports.createJob = (sessionData, jobData) => {
         }
     });
 };
+
+/* 
+    Search Job By Title
+    Business Logic: 
+
+*/
+module.exports.searchJobByTitleAndDescription = () => {};
+
+/* 
+    Search Job By Location
+    Business Logic:
+*/
+module.exports.searchJobByLocation = () => {};
+
+/* 
+    Edit a job offer
+    Business Logic:
+    1. 
+*/
+module.exports.editJob = (sessionData, jobData) => {};
