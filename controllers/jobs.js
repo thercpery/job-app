@@ -78,51 +78,72 @@ module.exports.viewJobById = (id) => {
     3. Save the job data in the database.
 */
 module.exports.createJob = (sessionData, jobData) => {
-    if(!sessionData.is_admin && !sessionData.is_hired){
-        // If user is not an admin and is not hired
-        return {
-            statusCode: 200,
-            response: false
-        };
-    }
-    else{
-        // If user is hired and an admin
-        if(
-            jobData.hasOwnProperty("job_title") &&
-            jobData.hasOwnProperty("job_description") &&
-            jobData.hasOwnProperty("salary") &&
-            jobData.hasOwnProperty("location")
-        ){
-            const newJob = {
-                job_title: jobData.job_title,
-                job_description: jobData.job_description,
-                salary: jobData.salary,
-                is_remote: jobData.is_remote || false,
-                location: jobData.location,
-                company_id: sessionData.company_id
-            };
-            return knex("jobs")
-            .insert(newJob)
-            .then((saved, err) => {
-                if(err){
-                    return {
-                        statusCode: 500,
-                        response: false
-                    };
-                }
-                else{
-                    return {
-                        statusCode: 201,
-                        response: true
-                    };
-                }
-            });
-        }
-        else{
+    return knex("users")
+    .first()
+    .where({
+        id: sessionData.id
+    })
+    .then((user, err) => {
+        if(err){
             return {
-                statusCode: 400,
+                statusCode: 500,
                 response: false
             };
         }
-    }
+        else{
+            if(user !== undefined){
+                if(user.is_admin && user.is_hired){
+                    if(
+                        jobData.hasOwnProperty("job_title") &&
+                        jobData.hasOwnProperty("job_description") &&
+                        jobData.hasOwnProperty("salary") &&
+                        jobData.hasOwnProperty("location")
+                    ){
+                        const newJob = {
+                            job_title: jobData.job_title,
+                            job_description: jobData.job_description,
+                            salary: jobData.salary,
+                            is_remote: jobData.is_remote || false,
+                            location: jobData.location,
+                            company_id: sessionData.company_id
+                        };
+                        return knex("jobs")
+                        .insert(newJob)
+                        .then((saved, err) => {
+                            if(err){
+                                return {
+                                    statusCode: 500,
+                                    response: false
+                                };
+                            }
+                            else{
+                                return {
+                                    statusCode: 201,
+                                    response: true
+                                };
+                            }
+                        });
+                    }
+                    else{
+                        return {
+                            statusCode: 403,
+                            response: false
+                        };
+                    }
+                }
+                else{
+                    return {
+                        statusCode: 403,
+                        response: false
+                    };
+                }
+            }
+            else{
+                return {
+                    statusCode: 403,
+                    response: false
+                };
+            }
+        }
+    });
 };

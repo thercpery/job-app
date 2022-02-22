@@ -12,7 +12,10 @@ router.get("/:id", (req, res) => jobController.viewJobById(req.params.id).then(r
 // Create a job
 router.post("/", auth.verify, (req, res) => {
     const sessionData = auth.decode(req.headers.authorization);
-    jobController.createJob(sessionData, req.body).then(result => res.status(result.statusCode).send(result.response));
+    jobController.createJob(sessionData, req.body).then(result => {
+        console.log(result);
+        res.status(result.statusCode).send(result.response);
+    });
 });
 
 module.exports = router;

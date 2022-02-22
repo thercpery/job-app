@@ -7,7 +7,7 @@ const router = express.Router();
 router.get("/", (req, res) => companyController.viewAllCompanies().then(result => res.status(result.statusCode).send(result.response)));
 
 // Add a company
-router.post("/", (req, res) => {
+router.post("/", auth.verify, (req, res) => {
     const sessionData = auth.decode(req.headers.authorization);
     companyController.addCompany(sessionData, req.body).then(result => res.status(result.statusCode).send(result.response));
 });

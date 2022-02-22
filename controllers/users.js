@@ -318,8 +318,8 @@ module.exports.viewProfile = (sessionUser, username) => {
                 else{
                     // User is not private
                     return {
-                        statusCode: 200,
-                        response: user
+                        statusCode: 403,
+                        response: false
                     };
                 }
             }
@@ -447,7 +447,7 @@ module.exports.makeUserAsAdmin = async (sessionData, userData) => {
     else{
         // If logged in user is not an admin.
         return {
-            statusCode: 200,
+            statusCode: 403,
             response: false
         };
     }
