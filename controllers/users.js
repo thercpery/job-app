@@ -692,3 +692,37 @@ module.exports.approveFollowRequest = (sessionData, userId) => {
         }
     });
 };
+
+/* 
+    Deny follow request for private users
+    Business Logic:
+    1. Get the authenticated user data and user ID from the request parameters.
+    2. Check the "users_followers" table with the authenticated user ID and user ID from the req parameters.
+    3. If data exists, delete follow request.
+*/
+module.exports.denyFollowRequest = (sessionData, userId) => {
+    const users_followers_data = {
+        follower_id: userId,
+        following_id: sessionData.id
+    };
+    return knex("users_followers")
+    .del()
+    .where({
+        follower_id: users_followers_data.follower_id,
+        following_id: users_followers_data.following_id
+    })
+    .then((saved, err) => {
+        if(err){
+            return {
+                statusCode: 500,
+                response: false
+            };
+        }
+        else{
+            return {
+                statusCode: 201,
+                response: true
+            };
+        }
+    })
+};

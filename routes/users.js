@@ -34,6 +34,11 @@ router.patch("/follow/approve/:id", auth.verify, (req, res) => {
     userController.approveFollowRequest(sessionData, req.params.id).then(result => res.status(result.statusCode).send(result.response));
 });
 
+router.delete("/follow/deny/:id", auth.verify, (req, res) => {
+    const sessionData = auth.decode(req.headers.authorization);
+    userController.denyFollowRequest(sessionData, req.params.id).then(result => res.status(result.statusCode).send(result.response));
+});
+
 // View profile of user
 router.get("/:username", (req, res) => {
     const sessionData = auth.decode(req.headers.authorization);
