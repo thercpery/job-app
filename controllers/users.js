@@ -528,10 +528,10 @@ module.exports.searchUser = (searchData, sessionData) => {
     .from("users")
     .where((builder) => {
         builder
-        .where("first_name", "like", `%${data}%`)
-        .orWhere("last_name", "like", `%${data}%`)
-        .orWhere("middle_name", "like", `%${data}%`)
-        .orWhere("username", "like", `%${data}%`)
+        .where("first_name", "ilike", `%${data}%`)
+        .orWhere("last_name", "ilike", `%${data}%`)
+        .orWhere("middle_name", "ilike", `%${data}%`)
+        .orWhere("username", "ilike", `%${data}%`)
     })
     .then((users, err) => {
         if(err){
@@ -675,7 +675,8 @@ module.exports.approveFollowRequest = (sessionData, userId) => {
     })
     .where({
         follower_id: users_followers_data.follower_id,
-        following_id: users_followers_data.following_id
+        following_id: users_followers_data.following_id,
+        is_approved: false
     })
     .then((saved, err) => {
         if(err){
@@ -725,4 +726,50 @@ module.exports.denyFollowRequest = (sessionData, userId) => {
             };
         }
     })
+};
+
+/* 
+    Make authenticated user public/private
+    Business Logic:
+    1. Get the data from the authenticated user.
+    2. Check the authenticated user on the database.
+    3. Set the user to public/private.
+*/
+module.exports.changeProfileVisibility = (sessionData) => {
+    return knex("users")
+    .first()
+    .where({
+        id: sessionData.id
+    })
+    .then((user, err) => {
+        if(err){
+            return {
+                statusCode: 500,
+                response: false
+            };
+        }
+        else{
+            return knex("users")
+            .update({
+                is_private: !user.is_private
+            })
+            .where({
+                id: sessionData.id
+            })
+            .then((saved, err) => {
+                if(err){
+                    return {
+                        statusCode: 500,
+                        response: false
+                    };
+                }
+                else{
+                    return {
+                        statusCode: 201,
+                        response: true
+                    };
+                }
+            })
+        }
+    });
 };

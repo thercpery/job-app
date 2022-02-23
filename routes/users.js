@@ -29,14 +29,22 @@ router.patch("/follow/:id", auth.verify, (req, res) => {
     userController.followUser(sessionData, req.params.id).then(result => res.status(result.statusCode).send(result.response));
 });
 
+// Approve follow request for private users
 router.patch("/follow/approve/:id", auth.verify, (req, res) => {
     const sessionData = auth.decode(req.headers.authorization);
     userController.approveFollowRequest(sessionData, req.params.id).then(result => res.status(result.statusCode).send(result.response));
 });
 
+// Deny follow request for private users
 router.delete("/follow/deny/:id", auth.verify, (req, res) => {
     const sessionData = auth.decode(req.headers.authorization);
     userController.denyFollowRequest(sessionData, req.params.id).then(result => res.status(result.statusCode).send(result.response));
+});
+
+// Make user public/private
+router.patch("/changevisibility", auth.verify, (req, res) => {
+    const sessionData = auth.decode(req.headers.authorization);
+    userController.changeProfileVisibility(sessionData).then(result => res.status(result.statusCode).send(result.response));
 });
 
 // View profile of user

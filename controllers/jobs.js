@@ -151,15 +151,121 @@ module.exports.createJob = (sessionData, jobData) => {
 /* 
     Search Job By Title
     Business Logic: 
-
+    1. Get the search data from the request body.
+    2. Check the database that matches or close to the search data from the search body.
+    3. If no data found, return false. Otherwise, return true.
 */
-module.exports.searchJobByTitleAndDescription = () => {};
+module.exports.searchJobs = (filter) => {
+    return knex
+    .select()
+    .from("jobs")
+    .where((builder) => {
+        builder
+        .where({ is_offered: true })
+        .where("job_title", "ilike", `%${filter.jobData}%`)
+        .orWhere("job_description", "ilike", `%${filter.jobData}%`)
+        .orWhere("location", "ilike", `%${filter.jobData}%`)
+        // .orWhere({
+        //     is_remote: filter.is_remote
+        // })
+    })
+    .then((jobs, err) => {
+        if(err){
+            return {
+                statusCode: 500,
+                response: false
+            };
+        }
+        else{
+            return {
+                statusCode: 200,
+                response: jobs
+            };
+        }
+    });
+};
 
 /* 
-    Search Job By Location
+    Change offer status
     Business Logic:
+    1. Check if the authenticated user is an admin. If user is not an admin, return false.
+    2. Get the job ID from the request parameters.
+    3. Check the job data that matches the job ID. If found, change offer status, otherwise, return false.
 */
-module.exports.searchJobByLocation = () => {};
+module.exports.changeOfferStatus = (sessionData, jobId) => {
+    return knex("users")
+    .first()
+    .where({
+        id: sessionData.id
+    })
+    .then((user, err) => {
+        if(err){
+            return {
+                statusCode: 500,
+                response: false
+            };
+        }
+        else{
+            if(user.is_admin){
+                // If user is an admin
+                return knex("jobs")
+                .first()
+                .where({
+                    id: jobId,
+                    company_id: sessionData.company_id
+                })
+                .then((job, err) => {
+                    if(err){
+                        return {
+                            statusCode: 500,
+                            response: false
+                        };
+                    }
+                    else{
+                        if(job !== undefined){
+                            return knex("jobs")
+                            .update({
+                                is_offered: !job.is_offered
+                            })
+                            .where({
+                                id: job.id,
+                                company_id: job.company_id
+                            })
+                            .then((saved, err) => {
+                                if(err){
+                                    return {
+                                        statusCode: 500,
+                                        response: false
+                                    };
+                                }
+                                else{
+                                    return {
+                                        statusCode: 201,
+                                        response: true
+                                    };
+                                }
+                            });
+                        }
+                        else{
+                            // If job is not found.
+                            return {
+                                statusCode: 404,
+                                response: false
+                            };
+                        }
+                    }
+                })
+            }
+            else{
+                // User is not an admin
+                return {
+                    statusCode: 403,
+                    response: false
+                };
+            }   
+        }
+    })
+};
 
 /* 
     Edit a job offer
