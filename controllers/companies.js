@@ -146,13 +146,14 @@ module.exports.searchCompany = (searchData) => {
         }
         else{
             if(companies.length !== 0){
+                // If there are matches.
                 return {
                     statusCode: 200,
                     response: companies
                 };
             }
             else{
-                // If no companies matches.
+                // If no company matches.
                 return {
                     statusCode: 404,
                     response: false
@@ -161,3 +162,4 @@ module.exports.searchCompany = (searchData) => {
         }
     });
 };
+

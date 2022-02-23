@@ -61,17 +61,17 @@ exports.up = function(knex) {
             table.timestamp("created_at").defaultTo(knex.fn.now());
             table.timestamp("updated_at").defaultTo(knex.fn.now());
         })
-        // .createTable("job_experiences", table => {
-        //     table.increments("id").primary();
-        //     table.integer("user_id").references("id").inTable("users");
-        //     table.integer("company_id").references("id").inTable("companies");
-        //     table.string("position").notNullable();
-        //     table.date("start_date").notNullable().defaultTo(knex.fn.now());
-        //     table.date("end_date");
-        //     table.boolean("is_active").defaultTo(true);
-        //     table.timestamp("created_at").defaultTo(knex.fn.now());
-        //     table.timestamp("updated_at").defaultTo(knex.fn.now());
-        // });
+        .createTable("job_experiences", table => {
+            table.increments("id").primary();
+            table.integer("user_id").references("id").inTable("users");
+            table.integer("company_id").references("id").inTable("companies");
+            table.string("position").notNullable();
+            table.date("start_date").notNullable().defaultTo(knex.fn.now());
+            table.date("end_date");
+            table.boolean("is_active").defaultTo(true);
+            table.timestamp("created_at").defaultTo(knex.fn.now());
+            table.timestamp("updated_at").defaultTo(knex.fn.now());
+        });
         
 };
 
@@ -81,7 +81,7 @@ exports.up = function(knex) {
  */
 exports.down = function(knex) {
     return knex.schema
-    // .dropTableIfExists("job_experiences")
+        .dropTableIfExists("job_experiences")
         .dropTableIfExists("job_applications")
         .dropTableIfExists("jobs")
         .dropTableIfExists("users_followers")
