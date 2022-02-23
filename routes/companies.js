@@ -12,6 +12,9 @@ router.post("/", auth.verify, (req, res) => {
     companyController.addCompany(sessionData, req.body).then(result => res.status(result.statusCode).send(result.response));
 });
 
+// Search company
+router.get("/search", (req, res) => companyController.searchCompany(req.body).then(result => res.status(result.statusCode).send(result.response)));
+
 // View company by ID
 router.get("/:id", (req, res) => companyController.viewCompanyByID(req.params.id).then(result => res.status(result.statusCode).send(result.response)));
 

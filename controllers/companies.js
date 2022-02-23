@@ -121,8 +121,43 @@ module.exports.viewCompanyByID = (id) => {
 };
 
 /* 
-    Search companies by company name
+    Search companies
     Business Logic:
-    1. 
+    1. Get the search data from the request body.
+    2. Search the company data that matches or close to the search data.
+    3. If no data found, return false. Otherwise, return true.
 */
-module.exports.searchByCompanyName = (searchData) => {};
+module.exports.searchCompany = (searchData) => {
+    const data = searchData.searchData;
+    return knex
+    .select()
+    .from("companies")
+    .where((builder) => {
+        builder
+        .where("company_name", "ilike", `%${data}%`)
+        .orWhere("city_address", "ilike", `%${data}%`)
+    })
+    .then((companies, err) => {
+        if(err){
+            return {
+                statusCode: 500,
+                response: false
+            };
+        }
+        else{
+            if(companies.length !== 0){
+                return {
+                    statusCode: 200,
+                    response: companies
+                };
+            }
+            else{
+                // If no companies matches.
+                return {
+                    statusCode: 404,
+                    response: false
+                };
+            }
+        }
+    });
+};
